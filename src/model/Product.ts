@@ -17,14 +17,16 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     default: "This is a product",
   },
-  size: {
+
+  skinType: {
     type: String,
-    default: "M",
-    enum: ["S", "M", "L"]
+    default: "Normal",
+    enum: ["Combination", "Dry", "Oily", "Normal"],
   },
+
   image: {
-    type: String,
-    default: "https://picsum.photos/seed/picsum/600/400"
+    type: [{ type: String }],
+    default: "https://picsum.photos/seed/picsum/600/400",
   },
   categoryId: {
     type: Schema.Types.ObjectId,

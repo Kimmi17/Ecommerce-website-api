@@ -8,12 +8,11 @@ export type OrderDocument = Document & Order;
 export const OrderSchema = new mongoose.Schema({
   products: [
     {
-    type: OrderProductSchema
+      type: OrderProductSchema,
     },
   ],
   totalPrice: {
     type: Number,
-    default: 100
   },
   createdAt: {
     type: Date,

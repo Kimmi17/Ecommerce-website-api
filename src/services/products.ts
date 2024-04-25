@@ -7,14 +7,14 @@ const getAllProducts = async (
   searchQuery: string,
   minPrice: number,
   maxPrice: number
-): Promise<ProductDocument[]> => {
-  try { 
-    const totalCount = await Product.countDocuments();
-    return await Product.find({
+): Promise<{ totalProduct: number; products: ProductDocument[] }> => {
+  try {
+    const totalProduct = await Product.countDocuments();
+    const products = await Product.find({
       title: { $regex: searchQuery },
       price: { $gte: minPrice, $lte: maxPrice },
     })
-      // .sort({ title: 1 })
+
       .populate({
         path: "categoryId",
         select: { name: 1 },
@@ -22,6 +22,7 @@ const getAllProducts = async (
       .limit(limit)
       .skip(offset)
       .exec();
+    return { totalProduct, products };
   } catch (error) {
     throw new Error("Failed to fetch products");
   }
@@ -34,10 +35,10 @@ const getCategoryProducts = async (
   searchQuery: string,
   minPrice: number,
   maxPrice: number
-): Promise<ProductDocument[]> => {
-  try { 
-    const totalCount = await Product.countDocuments({ categoryId });
-    return await Product.find({
+): Promise<{ totalProduct: number; products: ProductDocument[] }> => {
+  try {
+    const totalProduct = await Product.countDocuments({ categoryId });
+    const products = await Product.find({
       categoryId,
       title: { $regex: searchQuery },
       price: { $gte: minPrice, $lte: maxPrice },
@@ -49,12 +50,15 @@ const getCategoryProducts = async (
       .limit(limit)
       .skip(offset)
       .exec();
+    return { totalProduct, products };
   } catch (error) {
     throw new Error("Failed to fetch products");
   }
 };
 
-const createProduct = async (Product: ProductDocument): Promise<ProductDocument> => {
+const createProduct = async (
+  Product: ProductDocument
+): Promise<ProductDocument> => {
   try {
     return await Product.save();
   } catch (error) {
@@ -62,7 +66,9 @@ const createProduct = async (Product: ProductDocument): Promise<ProductDocument>
   }
 };
 
-const getProductById = async (id: string): Promise<ProductDocument | undefined> => {
+const getProductById = async (
+  id: string
+): Promise<ProductDocument | undefined> => {
   const foundProduct = await Product.findById(id);
   if (foundProduct) {
     return foundProduct;
@@ -78,7 +84,10 @@ const deleteProductById = async (id: string) => {
   throw new NotFoundError();
 };
 
-const updateProduct = async (id: string, newInformation: Partial<ProductDocument>) => {
+const updateProduct = async (
+  id: string,
+  newInformation: Partial<ProductDocument>
+) => {
   const updatedProduct = await Product.findByIdAndUpdate(id, newInformation, {
     new: true,
   });

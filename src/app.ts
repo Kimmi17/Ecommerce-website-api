@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 
 import productsRouter from "./routers/productsRouter";
 import usersRouter from "./routers/usersRouter";
@@ -11,6 +12,9 @@ const app = express();
 app.use(express.json());
 
 dotenv.config({ path: ".env" });
+
+// Enable CORS for all routes
+app.use(cors());
 
 app.get("/", (request: Request, response: Response) => {
   response.status(200).json({ message: "Hello world!" });

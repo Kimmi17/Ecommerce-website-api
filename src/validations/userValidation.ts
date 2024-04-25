@@ -1,7 +1,7 @@
-import Joi, { Schema } from 'joi';
-import { Request, Response, NextFunction } from 'express';
+import Joi, { Schema } from "joi";
+import { Request, Response, NextFunction } from "express";
 
-import { BadRequest } from '../errors/ApiError';
+import { BadRequest } from "../errors/ApiError";
 
 type UserSchema = Schema & {
   firstname?: Schema;
@@ -9,17 +9,21 @@ type UserSchema = Schema & {
   email: Schema;
   password: Schema;
   role?: Schema;
-}
+};
 
 export const createUserValidation: UserSchema = Joi.object({
   firstname: Joi.string().required().min(3).max(20).trim().strict(),
   lastname: Joi.string().required().min(3).max(50).trim().strict(),
   email: Joi.string().email().required(),
-  password: Joi.string().required().min(3).max(50).trim().strict(),
-  role: Joi.string().valid('customer', 'admin').required(),
+  password: Joi.string().min(3).max(50).trim().strict(),
+  role: Joi.string().valid("customer", "admin"),
 }) as UserSchema;
 
-export const validateCreateUser = async (req: Request, res: Response, next: NextFunction) => {
+export const validateCreateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     await createUserValidation.validateAsync(req.body, { abortEarly: false });
     next();
@@ -33,7 +37,11 @@ export const loginUserValidation: UserSchema = Joi.object({
   password: Joi.string().required().min(3).max(50).trim().strict(),
 }) as UserSchema;
 
-export const validateLoginUser = async (req: Request, res: Response, next: NextFunction) => {
+export const validateLoginUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     await loginUserValidation.validateAsync(req.body, { abortEarly: false });
     next();

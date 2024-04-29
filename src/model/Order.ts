@@ -14,6 +14,11 @@ export const OrderSchema = new mongoose.Schema({
   totalPrice: {
     type: Number,
   },
+  paymentStatus: {
+    type: String,
+    default: "PENDING",
+    enum: ["PENDING", "FAILED", "SUCCESSED"],
+  },
   createdAt: {
     type: Date,
     default: Date.now(),

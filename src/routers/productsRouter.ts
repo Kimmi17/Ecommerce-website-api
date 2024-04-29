@@ -1,16 +1,27 @@
 import express from "express";
 
-import { getAllProducts, createProduct, getProduct, updateProduct, deleteProduct, getCategoryProducts } from "../controllers/products";
+import {
+  getAllProducts,
+  createProduct,
+  getProduct,
+  updateProduct,
+  deleteProduct,
+  getCategoryProducts,
+  searchProduct,
+} from "../controllers/products";
 import verifyJWT from "../middlewares/verifyJWT";
 import adminCheck from "../middlewares/adminCheck";
 
 const router = express.Router();
 
 // GET PRODUCTS
-router.get("/", getAllProducts)
+router.get("/", getAllProducts);
 
 // GET PRODUCTS BY CATEGORY
-router.get("/category/:categoryId", getCategoryProducts)
+router.get("/category/:categoryId", getCategoryProducts);
+
+// SEARCH PRODUCTS BY KEYWORD
+router.get("/search/:keyword", searchProduct);
 
 // CREATE A PRODUCT
 router.post("/", verifyJWT, adminCheck, createProduct);

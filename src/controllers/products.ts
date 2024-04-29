@@ -70,6 +70,31 @@ export async function getCategoryProducts(
     next(new InternalServerError());
   }
 }
+// SEARCH PRODUCT BY KEYWORD
+
+export async function searchProduct(
+  request: Request,
+  response: Response,
+  next: NextFunction
+) {
+  // get key word from url params
+  // search product in database
+  try {
+    const keyword = request.params.keyword;
+    const products = await Product.find({
+      title: { $regex: new RegExp(keyword, "i") },
+    });
+
+    response.json({
+      totalProduct: products.length,
+      products,
+    });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ error: "Internal server error" });
+  }
+}
+//  return result matching
 
 // CREATE A PRODUCT
 export async function createProduct(

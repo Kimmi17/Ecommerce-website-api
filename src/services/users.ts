@@ -7,10 +7,10 @@ import User, { UserDocument } from "../model/User";
 const getAllUsers = async (): Promise<UserDocument[]> => {
   // find: methods by mongoose
   try {
-  return await User.find();
-} catch (error) {
-  throw new Error("Failed to fetch users from the database");
-}
+    return await User.find();
+  } catch (error) {
+    throw new Error("Failed to fetch users from the database");
+  }
 };
 
 const createUser = async (user: UserDocument): Promise<UserDocument> => {
@@ -25,21 +25,24 @@ const createUser = async (user: UserDocument): Promise<UserDocument> => {
   }
 };
 
-const updateUser = async (userId: string, userData: Partial<UserDocument>): Promise<UserDocument | null> => {
-try {
-  return await User.findByIdAndUpdate(userId, userData, { new: true });
-} catch (error) {
-  throw new NotFoundError();
-}
+const updateUser = async (
+  userId: string,
+  userData: Partial<UserDocument>
+): Promise<UserDocument | null> => {
+  try {
+    return await User.findByIdAndUpdate(userId, userData, { new: true });
+  } catch (error) {
+    throw new NotFoundError();
+  }
 };
 
 const deleteUser = async (userId: string): Promise<boolean> => {
-try {
-  const deletedUser = await User.findByIdAndDelete(userId);
-  return !!deletedUser;
-} catch (error) {
-  throw new NotFoundError();
-}
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+    return !!deletedUser;
+  } catch (error) {
+    throw new NotFoundError();
+  }
 };
 
 const getUserByEmail = async (email: string): Promise<UserDocument> => {
@@ -50,4 +53,10 @@ const getUserByEmail = async (email: string): Promise<UserDocument> => {
   throw new NotFoundError("This email is not existed!");
 };
 
-export default { getAllUsers, createUser, updateUser, deleteUser, getUserByEmail };
+export default {
+  getAllUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+  getUserByEmail,
+};

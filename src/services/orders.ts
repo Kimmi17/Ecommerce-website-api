@@ -1,5 +1,6 @@
 import { NotFoundError } from "../errors/ApiError";
 import Order, { OrderDocument } from "../model/Order";
+import Product from "../model/Product";
 import User, { UserDocument } from "../model/User";
 
 const getAllOrders = async (): Promise<OrderDocument[]> => {
@@ -19,10 +20,24 @@ const createOrder = async (order: OrderDocument): Promise<OrderDocument> => {
 };
 
 // get orders by userId
-const getOrderByUserId = async (userId: string): Promise<UserDocument | undefined> => {
-  const foundOrder = await User.findById(userId);
-  if (foundOrder) {
-    return foundOrder;
+const getOrderByUserId = async (userId: string): Promise<any> => {
+  const user = await User.findById(userId);
+  if (user) {
+    // const pros = await Promise.all(user.orders?.map(p => p.products.map(x=>x.productId)))
+    const productIds = user.orders
+      ?.map((p) => p.products.map((x: any) => x.productId))
+      .flat();
+    const prod = await Product.find({ _id: { $in: productIds } });
+    const orders = user.orders?.map((o) => ({
+      ...o,
+      products: o.products.map((p: any) =>
+        prod.find((x) => x._id === p.productId)
+      ),
+    }));
+    return {
+      ...user,
+      orders,
+    };
   }
   throw new NotFoundError();
 };
@@ -35,9 +50,25 @@ const deleteOrderById = async (id: string) => {
   throw new NotFoundError();
 };
 
-const updateOrder = async (id: string, newInformation: Partial<OrderDocument>) => {
+const updateOrder = async (
+  id: string,
+  newInformation: Partial<OrderDocument>
+) => {
   const updatedOrder = await Order.findByIdAndUpdate(id, newInformation, {
     new: true,
+  });
+  if (updatedOrder) {
+    return updatedOrder;
+  }
+  throw new NotFoundError();
+};
+
+const updateOrderPaymentStatus = async (
+  orderId: string,
+  paymentStatus: string
+) => {
+  const updatedOrder = await Order.findByIdAndUpdate(orderId, {
+    paymentStatus,
   });
   if (updatedOrder) {
     return updatedOrder;
@@ -51,4 +82,5 @@ export default {
   getOrderByUserId,
   deleteOrderById,
   updateOrder,
+  updateOrderPaymentStatus,
 };

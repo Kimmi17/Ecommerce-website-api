@@ -1,13 +1,28 @@
 import express from "express";
 
-import { createUser, deleteUser, loginUser, getAllUsers, updatedUser, requestPassword, banUser, unbanUser } from "../controllers/users";
+import {
+  createUser,
+  deleteUser,
+  loginUser,
+  getAllUsers,
+  updatedUser,
+  requestPassword,
+  banUser,
+  unbanUser,
+  getUserData,
+} from "../controllers/users";
 import verifyJWT from "../middlewares/verifyJWT";
 import adminCheck from "../middlewares/adminCheck";
-import { validateCreateUser, validateLoginUser } from "../validations/userValidation";
+import {
+  validateCreateUser,
+  validateLoginUser,
+} from "../validations/userValidation";
 
 const router = express.Router();
 
 router.get("/", getAllUsers);
+
+router.get("/getUserByToken", verifyJWT, getUserData);
 
 // LOGIN
 router.post("/login", validateLoginUser, loginUser);

@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-
+import jwt from "jsonwebtoken";
 import validator from "validator";
 
 import usersService from "../services/users";
@@ -10,11 +10,13 @@ import {
   InternalServerError,
   NotFoundError,
   ConflictError,
+  ForbiddenError,
 } from "../errors/ApiError";
 import User, { UserDocument } from "../model/User";
 import apiErrorhandler from "../middlewares/apiErrorhandler";
 import { generateToken } from "../util/generateToken";
 import { hashPassword } from "../util/hashPassword";
+import { DecodedUser } from "../misc/type";
 
 export async function getAllUsers(
   _: Request,
@@ -29,6 +31,28 @@ export async function getAllUsers(
   }
 }
 
+export async function getUserData(
+  request: Request,
+  response: Response,
+  next: NextFunction
+) {
+  try {
+    const authHeader = request.headers.authorization;
+    const JWT_SECRET = process.env.JWT_SECRET as string;
+    if (authHeader) {
+      const token = authHeader.split(" ")[1];
+
+      const decodedToken = (await jwt.verify(token, JWT_SECRET)) as DecodedUser;
+
+      const email = decodedToken.email;
+
+      const userData = await usersService.getUserByEmail(email);
+      response.status(200).json(userData);
+    }
+  } catch (error) {
+    next(new ForbiddenError("Invalid token!"));
+  }
+}
 // REGISTER
 export async function createUser(
   request: Request,
@@ -36,7 +60,7 @@ export async function createUser(
   next: NextFunction
 ) {
   try {
-    const { firstname, lastname, email, password } = request.body;
+    const { firstname, lastname, email, password, avatar } = request.body;
 
     // Validate email
     if (!validator.isEmail(email)) {
@@ -46,10 +70,11 @@ export async function createUser(
     const hashedPassword = await hashPassword(password);
 
     const user = new User({
-      firstname: firstname,
-      lastname: lastname,
-      email: email,
+      firstname,
+      lastname,
+      email,
       password: hashedPassword,
+      avatar,
     });
     const newUser = await usersService.createUser(user);
     response.status(201).json(newUser);

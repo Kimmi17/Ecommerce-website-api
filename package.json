@@ -34,7 +34,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/server.ts",
-    "build": "tsc -p . && mkdir -p public && cp -r src/public/* public/",
+    "build": "[my-framework] build --output public && tsc -p .",
     "test": "jest --runInBand --forceExit --detectOpenHandles --coverage --verbose false"
   },
   "devDependencies": {
